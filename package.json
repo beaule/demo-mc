@@ -1,7 +1,7 @@
 {
-  "name": "datavillage-sample-app",
+  "name": "demo-mc",
   "version": "1.0.0",
-  "description": "Create your first privacy by design app.",
+  "description": "",
   "main": "src/index.js",
   "scripts": {
     "start": "nodemon src/index.js"
