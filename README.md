@@ -1,2 +1,2 @@
-# demo-mc
+# sample-app
 Created with CodeSandbox
