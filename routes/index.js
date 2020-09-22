@@ -32,7 +32,7 @@ router.get("/simpleQueryDigitalTwin", function (req, res, next) {
   //query digital twin into the data cage (confidenital graph engine)
   var query = {
     query:
-      "{Total{uri amount{byDistance byMinute} frequency{perWeek} speed{average}  observationPeriod{hasBeginning{year month day hour formatted} hasEnd{year month day hour formatted}}}}",
+      "{Year (filter:{year:2020}){year physicalActivity{amount{byDistance byHour byRepetition} frequency{perWeek} intensity{uri duration}}}}",
     variables: {}
   };
 
@@ -52,7 +52,7 @@ router.get("/advancedQueryDigitalTwin", function (req, res, next) {
   //query digital twin into the data cage (confidenital graph engine)
   var query = {
     query:
-      "{week (filter:{year:2020}){week month year physicalActivity{uri amount{byDistance byMinute} frequency{perWeek} intensity{uri duration}}}}",
+      "{Total{uri amount{byDistance byMinute} frequency{perWeek} speed{average} } week (filter:{year:2020}){week month year physicalActivity{uri amount{byDistance byMinute} frequency{perWeek} intensity{uri duration}}}}",
     variables: {}
   };
 
