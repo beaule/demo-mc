@@ -69,30 +69,27 @@
 
   // Add data
   chart.data = [{
-    "country": "Elevé",
-    "litres": {{ intensityVigorous }},
-    "Bottles": {{ intensityVigorous }}
+    "intensity": "Elevé",
+    "duration": {{ intensityVigorous }}
   }, {
-    "country": "Modéré",
-    "litres": {{ intensityModerate }},
-    "Bottles": {{ intensityModerate }}
+    "intensity": "Modéré",
+    "duration": {{ intensityModerate }}
   }, {
-    "country": "Faible",
-    "litres": {{ intensityLow }},
-    "Bottles": {{ intensityLow }}
+    "intensity": "Faible",
+    "duration": {{ intensityLow }}
   }];
 
   // Add and configure Series
   var pieSeries = chart.series.push(new am4charts.PieSeries());
-  pieSeries.dataFields.value = "litres";
-  pieSeries.dataFields.category = "country";
+  pieSeries.dataFields.value = "duration";
+  pieSeries.dataFields.category = "intensity";
   pieSeries.slices.template.stroke = new am4core.InterfaceColorSet().getFor("background");
   pieSeries.slices.template.strokeWidth = 1;
   pieSeries.slices.template.strokeOpacity = 1;
 
   // Disabling labels and ticks on inner circle
   pieSeries.labels.template.disabled = true;
-  pieSeries.ticks.template.disabled = true;
+  pieSeries.ticks.template.disabled = false;
 
   // Disable sliding out of slices
   pieSeries.slices.template.states.getKey("hover").properties.shiftRadius = 0;
@@ -112,8 +109,8 @@
 
   // Add second series
   var pieSeries2 = chart.series.push(new am4charts.PieSeries());
-  pieSeries2.dataFields.value = "bottles";
-  pieSeries2.dataFields.category = "country";
+  pieSeries2.dataFields.value = "duration";
+  pieSeries2.dataFields.category = "intensity";
   pieSeries2.slices.template.stroke = new am4core.InterfaceColorSet().getFor("background");
   pieSeries2.slices.template.strokeWidth = 1;
   pieSeries2.slices.template.strokeOpacity = 1;
@@ -129,7 +126,7 @@
   label.horizontalCenter = "middle";
   label.verticalCenter = "middle";
   label.adapter.add("text", function (text, target) {
-    return "[font-size:18px]total[/]:\n[bold font-size:30px]" + pieSeries.dataItem.values.value.sum + "[/]";
+    return "[bold font-size:30px]" + pieSeries.dataItem.values.value.sum + " heures \nd'activité physique \nen {{year}}.[/]";
   })
 
 

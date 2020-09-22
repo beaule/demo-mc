@@ -11,6 +11,7 @@ var Session = require("../lib/session.js");
 var Authorization = require("../lib/api/authorization.js");
 var Consents = require("../lib/api/consents.js");
 var Custom = require("../lib/custom.js");
+var moment = require("moment");
 
 /* get home */
 router.get("/", function (req, res, next) {
@@ -98,6 +99,21 @@ function renderHome(req, res, active) {
           )
             intensityLow = intensities[i].duration;
         }
+        console.log(intensityVigorous);
+        var observationPeriod =
+          response.Year[0].physicalActivity[0].observationPeriod[0];
+        var start = moment(observationPeriod.hasBeginning.formatted);
+        var end = moment(observationPeriod.hasEnd.formatted);
+        var duration = moment.duration(end.diff(start));
+        var numberOfWeeks = duration.asWeeks();
+
+        var intensityVigorousPerWeek = intensityVigorous / numberOfWeeks;
+        var intensityModeratePerWeek = intensityModerate / numberOfWeeks;
+        var intensityLowPerWeek = intensityLow / numberOfWeeks;
+        console.log(intensityVigorousPerWeek);
+        console.log(intensityModeratePerWeek);
+        console.log(intensityLowPerWeek);
+
         res.render("home", {
           layout: "master",
           actionActivateConsent: Authorization.authorize(
@@ -109,13 +125,12 @@ function renderHome(req, res, active) {
           active: active,
           year: year,
           totalDuration: sumIntensities,
-          intensityVigorous: parseInt(
-            (intensityVigorous / sumIntensities) * 100
-          ),
-          intensityModerate: parseInt(
-            (intensityModerate / sumIntensities) * 100
-          ),
-          intensityLow: parseInt((intensityLow / sumIntensities) * 100)
+          intensityVigorous: parseInt(intensityVigorous),
+          intensityModerate: parseInt(intensityModerate),
+          intensityLow: parseInt(intensityLow),
+          intensityVigorousPerWeek: intensityVigorousPerWeek,
+          intensityModeratePerWeek: intensityModeratePerWeek,
+          intensityLowPerWeek: intensityLowPerWeek
         });
       }
     });
