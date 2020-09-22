@@ -10,7 +10,6 @@ var router = express.Router();
 var Session = require("../lib/session.js");
 var Authorization = require("../lib/api/authorization.js");
 var Consents = require("../lib/api/consents.js");
-var Cages = require("../lib/api/cages.js");
 var Custom = require("../lib/custom.js");
 
 /* get home */
@@ -28,11 +27,11 @@ router.get("/callback", function (req, res, next) {
 });
 
 /* simple query digital twin  */
-router.get("/simpleQueryDigitalTwin", function (req, res, next) {
+function _simpleQueryDigitalTwin(req, done) {
   //query digital twin into the data cage (confidenital graph engine)
   var query = {
     query:
-      "{Year (filter:{year:2020}){year physicalActivity{amount{byDistance byHour byRepetition} frequency{perWeek} intensity{uri duration}}}}",
+      "{Year (filter:{year:2020}){year physicalActivity{amount{byDistance byHour byRepetition} frequency{perWeek} intensity{uri duration} observationPeriod{hasBeginning{formatted} hasEnd{formatted} }}}}",
     variables: {}
   };
 
@@ -40,12 +39,11 @@ router.get("/simpleQueryDigitalTwin", function (req, res, next) {
     response
   ) {
     if (response != null) {
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(response.data));
-    } else res.writeHead(401, { "Content-Type": "application/json" });
-    res.end("Error occur during query digital twin flow");
+      return done(response.data);
+    } else return done(null);
+    return done(null);
   });
-});
+}
 
 /* advanced query digital twin  */
 router.get("/advancedQueryDigitalTwin", function (req, res, next) {
@@ -73,16 +71,66 @@ router.get("/advancedQueryDigitalTwin", function (req, res, next) {
  * @param {res} response
  */
 function renderHome(req, res, active) {
-  res.render("home", {
-    layout: "master",
-    actionActivateConsent: Authorization.authorize(
-      process.env.CLIENT_ID,
-      process.env.APP_URL + "callback",
-      Consents.ROOT_PATH_CONSENT_RECEIPT + process.env.CONSENT_RECEIPT_ID
-    ),
-    actionRevokeConsent: Authorization.deAuthorize(),
-    active: active
-  });
+  if (active) {
+    _simpleQueryDigitalTwin(req, function (response) {
+      if (response != null) {
+        var intensities = response.Year[0].physicalActivity[0].intensity;
+        var year = response.Year[0].year;
+        var sumIntensities = 0;
+        var intensityVigorous = 0;
+        var intensityModerate = 0;
+        var intensityLow = 0;
+        for (var i = 0; i < intensities.length; i++) {
+          sumIntensities += intensities[i].duration;
+          if (
+            intensities[i].uri ===
+            "http://www.semanticweb.org/hyk038/ontologies/2018/7/untitled-ontology-17#Vigorous"
+          )
+            intensityVigorous = intensities[i].duration;
+          if (
+            intensities[i].uri ===
+            "http://www.semanticweb.org/hyk038/ontologies/2018/7/untitled-ontology-17#Moderate"
+          )
+            intensityModerate = intensities[i].duration;
+          if (
+            intensities[i].uri ===
+            "http://www.semanticweb.org/hyk038/ontologies/2018/7/untitled-ontology-17#Low"
+          )
+            intensityLow = intensities[i].duration;
+        }
+        res.render("home", {
+          layout: "master",
+          actionActivateConsent: Authorization.authorize(
+            process.env.CLIENT_ID,
+            process.env.APP_URL + "callback",
+            Consents.ROOT_PATH_CONSENT_RECEIPT + process.env.CONSENT_RECEIPT_ID
+          ),
+          actionRevokeConsent: Authorization.deAuthorize(),
+          active: active,
+          year: year,
+          totalDuration: sumIntensities,
+          intensityVigorous: parseInt(
+            (intensityVigorous / sumIntensities) * 100
+          ),
+          intensityModerate: parseInt(
+            (intensityModerate / sumIntensities) * 100
+          ),
+          intensityLow: parseInt((intensityLow / sumIntensities) * 100)
+        });
+      }
+    });
+  } else {
+    res.render("home", {
+      layout: "master",
+      actionActivateConsent: Authorization.authorize(
+        process.env.CLIENT_ID,
+        process.env.APP_URL + "callback",
+        Consents.ROOT_PATH_CONSENT_RECEIPT + process.env.CONSENT_RECEIPT_ID
+      ),
+      actionRevokeConsent: Authorization.deAuthorize(),
+      active: active
+    });
+  }
 }
 
 /**
