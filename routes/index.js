@@ -75,6 +75,7 @@ function renderHome(req, res, active) {
   if (active) {
     _simpleQueryDigitalTwin(req, function (response) {
       if (response != null) {
+        //intensity
         var intensities = response.Year[0].physicalActivity[0].intensity;
         var year = response.Year[0].year;
         var sumIntensities = 0;
@@ -87,32 +88,32 @@ function renderHome(req, res, active) {
             intensities[i].uri ===
             "http://www.semanticweb.org/hyk038/ontologies/2018/7/untitled-ontology-17#Vigorous"
           )
-            intensityVigorous = intensities[i].duration;
+            intensityVigorous = parseInt(intensities[i].duration / 60);
           if (
             intensities[i].uri ===
             "http://www.semanticweb.org/hyk038/ontologies/2018/7/untitled-ontology-17#Moderate"
           )
-            intensityModerate = intensities[i].duration;
+            intensityModerate = parseInt(intensities[i].duration / 60);
           if (
             intensities[i].uri ===
             "http://www.semanticweb.org/hyk038/ontologies/2018/7/untitled-ontology-17#Low"
           )
-            intensityLow = intensities[i].duration;
+            intensityLow = parseInt(intensities[i].duration / 60);
         }
-        console.log(intensityVigorous);
+        //frequency
+        var frequencyAveragePerWeek = Number(
+          response.Year[0].physicalActivity[0].frequency[0].perWeek.toFixed(1)
+        );
+        //physical activity
         var observationPeriod =
           response.Year[0].physicalActivity[0].observationPeriod[0];
         var start = moment(observationPeriod.hasBeginning.formatted);
         var end = moment(observationPeriod.hasEnd.formatted);
         var duration = moment.duration(end.diff(start));
         var numberOfWeeks = duration.asWeeks();
-
         var intensityVigorousPerWeek = intensityVigorous / numberOfWeeks;
         var intensityModeratePerWeek = intensityModerate / numberOfWeeks;
         var intensityLowPerWeek = intensityLow / numberOfWeeks;
-        console.log(intensityVigorousPerWeek);
-        console.log(intensityModeratePerWeek);
-        console.log(intensityLowPerWeek);
 
         res.render("home", {
           layout: "master",
@@ -128,9 +129,7 @@ function renderHome(req, res, active) {
           intensityVigorous: parseInt(intensityVigorous),
           intensityModerate: parseInt(intensityModerate),
           intensityLow: parseInt(intensityLow),
-          intensityVigorousPerWeek: intensityVigorousPerWeek,
-          intensityModeratePerWeek: intensityModeratePerWeek,
-          intensityLowPerWeek: intensityLowPerWeek
+          frequencyAveragePerWeek: frequencyAveragePerWeek
         });
       }
     });

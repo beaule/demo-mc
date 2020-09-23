@@ -126,7 +126,7 @@
   label.horizontalCenter = "middle";
   label.verticalCenter = "middle";
   label.adapter.add("text", function (text, target) {
-    return "[bold font-size:30px]" + pieSeries.dataItem.values.value.sum + " heures \nd'activité physique \nen {{year}}.[/]";
+    return "[bold font-size:30px]" + pieSeries.dataItem.values.value.sum + " heures \nd'activité physique \nen {{year}}.\n\n{{frequencyAveragePerWeek}} sorties\npar semaine.[/]";
   })
 
 
