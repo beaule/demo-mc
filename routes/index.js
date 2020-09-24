@@ -42,16 +42,15 @@ function _simpleQueryDigitalTwin(req, done) {
     if (response != null) {
       return done(response.data);
     } else return done(null);
-    return done(null);
   });
 }
 
 /* advanced query digital twin  */
-router.get("/advancedQueryDigitalTwin", function (req, res, next) {
+function _advancedQueryDigitalTwin(req, done) {
   //query digital twin into the data cage (confidenital graph engine)
   var query = {
     query:
-      "{Total{uri amount{byDistance byMinute} frequency{perWeek} speed{average} } week (filter:{year:2020}){week month year physicalActivity{uri amount{byDistance byMinute} frequency{perWeek} intensity{uri duration}}}}",
+      "{week (filter:{year:2020}){year hasBeginning{day month year} physicalActivity{uri amount{byDistance byMinute byHour byRepetition} frequency{perWeek} intensity{uri duration}}}}",
     variables: {}
   };
 
@@ -59,12 +58,10 @@ router.get("/advancedQueryDigitalTwin", function (req, res, next) {
     response
   ) {
     if (response != null) {
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(response.data));
-    } else res.writeHead(401, { "Content-Type": "application/json" });
-    res.end("Error occur during query digital twin flow");
+      return done(response.data);
+    } else return done(null);
   });
-});
+}
 
 /**
  * render  home
@@ -88,17 +85,17 @@ function renderHome(req, res, active) {
             intensities[i].uri ===
             "http://www.semanticweb.org/hyk038/ontologies/2018/7/untitled-ontology-17#Vigorous"
           )
-            intensityVigorous = parseInt(intensities[i].duration / 60);
+            intensityVigorous = intensities[i].duration / 60;
           if (
             intensities[i].uri ===
             "http://www.semanticweb.org/hyk038/ontologies/2018/7/untitled-ontology-17#Moderate"
           )
-            intensityModerate = parseInt(intensities[i].duration / 60);
+            intensityModerate = intensities[i].duration / 60;
           if (
             intensities[i].uri ===
             "http://www.semanticweb.org/hyk038/ontologies/2018/7/untitled-ontology-17#Low"
           )
-            intensityLow = parseInt(intensities[i].duration / 60);
+            intensityLow = intensities[i].duration / 60;
         }
         //frequency
         var frequencyAveragePerWeek = Number(
@@ -115,21 +112,64 @@ function renderHome(req, res, active) {
         var intensityModeratePerWeek = intensityModerate / numberOfWeeks;
         var intensityLowPerWeek = intensityLow / numberOfWeeks;
 
-        res.render("home", {
-          layout: "master",
-          actionActivateConsent: Authorization.authorize(
-            process.env.CLIENT_ID,
-            process.env.APP_URL + "callback",
-            Consents.ROOT_PATH_CONSENT_RECEIPT + process.env.CONSENT_RECEIPT_ID
-          ),
-          actionRevokeConsent: Authorization.deAuthorize(),
-          active: active,
-          year: year,
-          totalDuration: sumIntensities,
-          intensityVigorous: parseInt(intensityVigorous),
-          intensityModerate: parseInt(intensityModerate),
-          intensityLow: parseInt(intensityLow),
-          frequencyAveragePerWeek: frequencyAveragePerWeek
+        var sportProfileIsLow = false;
+        var sportProfileIsMedium = false;
+        var sportProfileIsHigh = false;
+        if (intensityVigorousPerWeek + intensityModeratePerWeek < 100 / 60) {
+          sportProfileIsLow = true;
+          sportProfileIsMedium = false;
+          sportProfileIsHigh = false;
+        }
+        if (
+          intensityVigorousPerWeek + intensityModeratePerWeek >= 100 / 60 &&
+          intensityVigorousPerWeek + intensityModeratePerWeek < 300 / 60
+        ) {
+          sportProfileIsLow = false;
+          sportProfileIsMedium = true;
+          sportProfileIsHigh = false;
+        }
+        if (intensityVigorousPerWeek + intensityModeratePerWeek >= 300 / 60) {
+          sportProfileIsLow = false;
+          sportProfileIsMedium = false;
+          sportProfileIsHigh = true;
+        }
+
+        _advancedQueryDigitalTwin(req, function (response) {
+          if (response != null) {
+            res.render("home", {
+              layout: "master",
+              actionActivateConsent: Authorization.authorize(
+                process.env.CLIENT_ID,
+                process.env.APP_URL + "callback",
+                Consents.ROOT_PATH_CONSENT_RECEIPT +
+                  process.env.CONSENT_RECEIPT_ID
+              ),
+              actionRevokeConsent: Authorization.deAuthorize(),
+              active: active,
+              year: year,
+              totalDuration: parseInt(sumIntensities/60),
+              intensityVigorous: parseInt(intensityVigorous),
+              intensityModerate: parseInt(intensityModerate),
+              intensityLow: parseInt(intensityLow),
+              frequencyAveragePerWeek: frequencyAveragePerWeek,
+              sportProfileIsLow: sportProfileIsLow,
+              sportProfileIsMedium: sportProfileIsMedium,
+              sportProfileIsHigh: sportProfileIsHigh,
+              weeklyResults: response.week
+            });
+          } else {
+            res.render("home", {
+              layout: "master",
+              actionActivateConsent: Authorization.authorize(
+                process.env.CLIENT_ID,
+                process.env.APP_URL + "callback",
+                Consents.ROOT_PATH_CONSENT_RECEIPT +
+                  process.env.CONSENT_RECEIPT_ID
+              ),
+              actionRevokeConsent: Authorization.deAuthorize(),
+              active: active
+            });
+          }
         });
       }
     });

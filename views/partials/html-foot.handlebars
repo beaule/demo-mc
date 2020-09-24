@@ -59,16 +59,14 @@
   am4core.useTheme(am4themes_animated);
   // Themes end
 
-  // Create chart instance
-  var chart = am4core.create("chartdiv", am4charts.PieChart);
-  chart.startAngle = 160;
-  chart.endAngle = 380;
+  
 
-  // Let's cut a hole in our Pie chart the size of 40% the radius
-  chart.innerRadius = am4core.percent(40);
 
-  // Add data
-  chart.data = [{
+  var chart3 = am4core.create("chartdiv", am4charts.PieChart);
+chart3.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+// Add data
+  chart3.data = [{
     "intensity": "Elevé",
     "duration": {{ intensityVigorous }}
   }, {
@@ -79,57 +77,179 @@
     "duration": {{ intensityLow }}
   }];
 
-  // Add and configure Series
-  var pieSeries = chart.series.push(new am4charts.PieSeries());
-  pieSeries.dataFields.value = "duration";
-  pieSeries.dataFields.category = "intensity";
-  pieSeries.slices.template.stroke = new am4core.InterfaceColorSet().getFor("background");
-  pieSeries.slices.template.strokeWidth = 1;
-  pieSeries.slices.template.strokeOpacity = 1;
+chart3.radius = am4core.percent(70);
+chart3.innerRadius = am4core.percent(50);
+chart3.startAngle = 180;
+chart3.endAngle = 360;  
 
-  // Disabling labels and ticks on inner circle
-  pieSeries.labels.template.disabled = true;
-  pieSeries.ticks.template.disabled = false;
+var series = chart3.series.push(new am4charts.PieSeries());
+series.dataFields.value = "duration";
+series.dataFields.category = "intensity";
 
-  // Disable sliding out of slices
-  pieSeries.slices.template.states.getKey("hover").properties.shiftRadius = 0;
-  pieSeries.slices.template.states.getKey("hover").properties.scale = 1;
-  pieSeries.radius = am4core.percent(40);
-  pieSeries.innerRadius = am4core.percent(30);
+series.slices.template.cornerRadius = 10;
+series.slices.template.innerCornerRadius = 7;
+series.slices.template.draggable = true;
+series.slices.template.inert = true;
+series.alignLabels = false;
 
-  var cs = pieSeries.colors;
-  cs.list = [am4core.color(new am4core.ColorSet().getIndex(0))];
+series.hiddenState.properties.startAngle = 90;
+series.hiddenState.properties.endAngle = 90;
 
-  cs.stepOptions = {
-    lightness: -0.05,
-    hue: 0
-  };
-  cs.wrap = false;
-
-
-  // Add second series
-  var pieSeries2 = chart.series.push(new am4charts.PieSeries());
-  pieSeries2.dataFields.value = "duration";
-  pieSeries2.dataFields.category = "intensity";
-  pieSeries2.slices.template.stroke = new am4core.InterfaceColorSet().getFor("background");
-  pieSeries2.slices.template.strokeWidth = 1;
-  pieSeries2.slices.template.strokeOpacity = 1;
-  pieSeries2.slices.template.states.getKey("hover").properties.shiftRadius = 0.05;
-  pieSeries2.slices.template.states.getKey("hover").properties.scale = 1;
-
-  pieSeries2.labels.template.disabled = true;
-  pieSeries2.ticks.template.disabled = true;
+var label = chart3.seriesContainer.createChild(am4core.Label);
+label.textAlign = "middle";
+label.horizontalCenter = "middle";
+label.verticalCenter = "middle";
+label.adapter.add("text", function(text, target){
+  return "[bold font-size:30px]{{totalDuration}} heures \nd'activité physique.\n\n {{frequencyAveragePerWeek}} sortie(s)\npar semaine.[/]";
+})
 
 
-  var label = chart.seriesContainer.createChild(am4core.Label);
-  label.textAlign = "middle";
-  label.horizontalCenter = "middle";
-  label.verticalCenter = "middle";
-  label.adapter.add("text", function (text, target) {
-    return "[bold font-size:30px]" + pieSeries.dataItem.values.value.sum + " heures \nd'activité physique \nen {{year}}.\n\n{{frequencyAveragePerWeek}} sorties\npar semaine.[/]";
-  })
+  //second chart3
+  // Create chart3 instance
+  var chart2 = am4core.create("chartdivweekly", am4charts.XYChart);
+  chart2.hiddenState.properties.opacity = 0;
+
+  // Add data
+  chart2.data = [
+    {{#each weeklyResults }}
+    {
+      "date": "{{this.hasBeginning.year}}-{{this.hasBeginning.month}}-{{this.hasBeginning.day}}",
+      "intensity": {{this.physicalActivity.0.amount.0.byHour}}
+    },
+    {{/each}}
+  ];
+chart2.dateFormatter.inputDateFormat = "YYYY-M-d";
+chart2.zoomOutButton.disabled = true;
+
+var dateAxis = chart2.xAxes.push(new am4charts.DateAxis());
+dateAxis.renderer.grid.template.strokeOpacity = 0;
+dateAxis.renderer.minGridDistance = 50;
+dateAxis.dateFormats.setKey("day", "d");
+dateAxis.tooltip.hiddenState.properties.opacity = 1;
+dateAxis.tooltip.hiddenState.properties.visible = true;
 
 
+dateAxis.tooltip.adapter.add("x", function (x, target) {
+    return am4core.utils.spritePointToSvg({ x: chart2.plotContainer.pixelX, y: 0 }, chart2.plotContainer).x + chart2.plotContainer.pixelWidth / 2;
+})
+
+var valueAxis = chart2.yAxes.push(new am4charts.ValueAxis());
+valueAxis.renderer.inside = true;
+valueAxis.renderer.labels.template.fillOpacity = 0.3;
+valueAxis.renderer.grid.template.strokeOpacity = 0;
+valueAxis.min = 0;
+valueAxis.cursorTooltipEnabled = false;
+
+// goal guides
+var axisRange = valueAxis.axisRanges.create();
+axisRange.value = 2.5;
+axisRange.grid.strokeOpacity = 0.1;
+axisRange.label.text = "Actif";
+axisRange.label.align = "right";
+axisRange.label.verticalCenter = "bottom";
+axisRange.label.fillOpacity = 0.8;
+
+valueAxis.renderer.gridContainer.zIndex = 1;
+
+var axisRange2 = valueAxis.axisRanges.create();
+axisRange2.value = 5;
+axisRange2.grid.strokeOpacity = 0.1;
+axisRange2.label.text = "Très actif";
+axisRange2.label.align = "right";
+axisRange2.label.verticalCenter = "bottom";
+axisRange2.label.fillOpacity = 0.8;
+
+
+
+var series = chart2.series.push(new am4charts.ColumnSeries);
+series.dataFields.valueY = "intensity";
+series.dataFields.dateX = "date";
+series.tooltipText = "{valueY.value}";
+series.tooltip.pointerOrientation = "vertical";
+series.tooltip.hiddenState.properties.opacity = 1;
+series.tooltip.hiddenState.properties.visible = true;
+series.tooltip.adapter.add("x", function (x, target) {
+    return am4core.utils.spritePointToSvg({ x: chart2.plotContainer.pixelX, y: 0 }, chart2.plotContainer).x + chart2.plotContainer.pixelWidth / 2;
+})
+
+var columnTemplate = series.columns.template;
+columnTemplate.width = 15;
+columnTemplate.column.cornerRadiusTopLeft =5;
+columnTemplate.column.cornerRadiusTopRight = 5;
+columnTemplate.strokeOpacity = 0;
+
+columnTemplate.adapter.add("fill", function (fill, target) {
+    var dataItem = target.dataItem;
+    if (dataItem.valueY >= 5) {
+        return chart2.colors.getIndex(0);
+    }
+    else if (dataItem.valueY > 2.5){
+        return chart2.colors.getIndex(1);
+    }
+    else {
+        return am4core.color("#a8b3b7");
+    }
+})
+
+var cursor = new am4charts.XYCursor();
+cursor.behavior = "panX";
+chart2.cursor = cursor;
+cursor.lineX.disabled = true;
+
+chart2.events.on("datavalidated", function () {
+    dateAxis.zoomToDates(new Date(2020, 1, 1), new Date(2020, 10, 31), false, true);
+});
+
+
+cursor.events.on("cursorpositionchanged", updateTooltip);
+dateAxis.events.on("datarangechanged", updateTooltip);
+
+function updateTooltip() {
+    dateAxis.showTooltipAtPosition(0.5);
+    series.showTooltipAtPosition(0.5, 0);
+    series.tooltip.validate(); // otherwise will show other columns values for a second
+}
+
+
+var chart3 = am4core.create("chartdivweek", am4charts.XYChart);
+
+chart3.data = [{
+        "intensitity": "Elevé",
+        "duration": {{weeklyResults.32.physicalActivity.0.intensity.0.duration}},
+    }, {
+        "intensitity": "Modéré",
+        "duration": {{weeklyResults.32.physicalActivity.1.intensity.0.duration}},
+    }, {
+        "intensitity": "Faible",
+        "duration": {{weeklyResults.32.physicalActivity.2.intensity.0.duration}},
+    }];
+
+//create category axis for years
+var categoryAxis = chart3.yAxes.push(new am4charts.CategoryAxis());
+categoryAxis.dataFields.category = "year";
+categoryAxis.renderer.inversed = true;
+categoryAxis.renderer.grid.template.location = 0;
+
+//create value axis for income and expenses
+var valueAxis = chart3.xAxes.push(new am4charts.ValueAxis());
+valueAxis.renderer.opposite = true;
+
+
+//create columns
+var series = chart3.series.push(new am4charts.ColumnSeries());
+series.dataFields.categoryY = "intensitity";
+series.dataFields.valueX = "duration";
+series.name = "Durée";
+series.columns.template.fillOpacity = 0.5;
+series.columns.template.strokeOpacity = 0;
+
+//add bullets
+var circleBullet = lineSeries.bullets.push(new am4charts.CircleBullet());
+circleBullet.circle.fill = am4core.color("#fff");
+circleBullet.circle.strokeWidth = 2;
+
+//add chart3 cursor
+chart3.cursor = new am4charts.XYCursor();
+chart3.cursor.behavior = "zoomY";
 
 </script>
-{{ intensityVigorous }}

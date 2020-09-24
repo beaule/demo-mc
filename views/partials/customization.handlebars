@@ -12,8 +12,7 @@
           <div class="row justify-content-center">
             <div class="col-lg-8">
               <!-- customization Modal - Title-->
-              <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0" id="portfolioModal1Label">Mon
-                activité
+              <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0" id="portfolioModal1Label">Mon niveau d'activité physique (NPA) {{year}}
               </h2>
               <!-- Icon Divider-->
               <div class="divider-custom">
@@ -21,13 +20,55 @@
                 <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
                 <div class="divider-custom-line"></div>
               </div>
-              s
-              <figure class="highcharts-figure">
+            <div class="row justify-content-center">
+                {{#if sportProfileIsLow}}
+                <div class="col-lg-4">
+                  <img src="assets/img/3rd-place.png" width="100px" />
+                  <h4>Peu actif</h4>
+                </div>
+                <div class="col-lg-4">
+                  <img src="assets/img/2nd-place-disabled.png" width="100px" />
+                  <h4 style="color:grey">Actif</h4>
+                </div>
+                <div class="col-lg-4">
+                  <img src="assets/img/1st-place-disabled.png" width="100px" />
+                  <h4 style="color:grey">Tres actif</h4>
+                </div>
+                {{/if}}
+                {{#if sportProfileIsMedium}}
+                <div class="col-lg-4">
+                  <img src="assets/img/3rd-place-disabled.png" width="100px" />
+                  <h4 style="color:grey">Peu actif</h4>
+                </div>
+                <div class="col-lg-4">
+                  <img src="assets/img/2nd-place.png" width="100px" />
+                  <h4>Actif</h4>
+                </div>
+                <div class="col-lg-4">
+                  <img src="assets/img/1st-place-disabled.png" width="100px" />
+                  <h4 style="color:grey">Tres actif</h4>
+                </div>
+                {{/if}}
+                {{#if sportProfileIsHigh}}
+                <div class="col-lg-4">
+                  <img src="assets/img/3rd-place-disabled.png" width="100px" />
+                  <h4 style="color:grey">Peu actif</h4>
+                </div>
+                <div class="col-lg-4">
+                  <img src="assets/img/2nd-place-disabled.png" width="100px" />
+                  <h4 style="color:grey">Actif</h4>
+                </div>
+                <div class="col-lg-4">
+                  <img src="assets/img/1st-place.png" width="100px" />
+                  <h4>Tres actif</h4>
+                </div>
+                {{/if}}
+              </div>
+              <br/><br/>
+              <figure class="highcharts-figure" style="margin-top:-100px">
                 <div id="chartdiv"></div>
-                <p class="highcharts-description">
-                </p>
               </figure>
-
+  
             </div>
           </div>
         </div>
@@ -49,20 +90,29 @@
             <div class="col-lg-8">
               <!-- customization Modal - Title-->
               <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0" id="portfolioModal2Label">Mes
-                rapports</h2>
+                rapports hebdomadaires</h2>
               <!-- Icon Divider-->
               <div class="divider-custom">
                 <div class="divider-custom-line"></div>
                 <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
                 <div class="divider-custom-line"></div>
               </div>
-
-              <!-- customization Modal - Text-->
-              <textarea name="" id="advancedQueryResponse" cols="50" rows="5"></textarea>
-              <button class="btn btn-primary" id="advancedQuery">
-                <i class="fas fa-search"></i>
-                Execute Query
-              </button>
+              <div id="chartdivweekly"></div>
+            <br/><br/>
+            <hr/>
+            <div class="form-group">
+            <select class="form-control" id="exampleFormControlSelect1">
+                  <option>Semaine 34</option>
+                  <option>Semaine 30</option>
+                  <option>Semaine 30</option>
+                  <option>Semaine 30</option>
+                  <option>Semaine 30</option>
+                </select>
+                <h3>Distance: {{weeklyResults.32.physicalActivity.0.amount.0.byDistance}} mètres</h3>
+                <h3>Durée: {{weeklyResults.32.physicalActivity.0.amount.0.byHour}} heures</h3>
+                <h3>Sorties: {{weeklyResults.32.physicalActivity.0.amount.0.byRepetition}}</h3>
+                <div id="chartdivweek"></div>
+              </div>
             </div>
           </div>
         </div>
