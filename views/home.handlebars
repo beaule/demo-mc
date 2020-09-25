@@ -109,31 +109,58 @@
     <div class="row">
        {{#if active}}
       <!-- App Item 1-->
-      <div class="col-md-6 col-lg-4 mb-5">
-        <div class="portfolio-item mx-auto" data-toggle="modal" data-target="#portfolioModal1">
-          <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-            <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-code fa-3x"></i>
-            </div>
-          </div>
-          <img class="img-fluid" src="https://www.mc.be/media/eneo-sport_tcm49-59990.jpg" alt="" />
+      <div class="col-md-4">
+        <div class="gallery">
+          <a target="_blank" href="img_5terre.jpg">
+            <img src="https://www.mc.be/media/media/jcpmf-vert_tcm49-31425.jpg" alt="Cinque Terre" width="600" height="400">
+          </a>
+          <div class="desc"><b>Je cours pour ma forme</b><br/>Vous êtes peu ou non sportifs et vous souhaitez améliorer votre forme grâce à la course à pied ? Le programme « Je cours pour ma forme » va vous aider à y arriver !</div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4 mb-5">
-        <div class="portfolio-item mx-auto" data-toggle="modal" data-target="#portfolioModal2">
-          <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-            <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-code fa-3x"></i>
-            </div>
-          </div>
-          <img class="img-fluid" src="https://www.mc.be/media/media/jcpmf-vert_tcm49-31425.jpg" alt="" />
+      <div class="col-md-8">
+        <h6>Au vu de vos performances, nous vous conseillons le Niveau 3B+Long.</h6> 
+        <h6>Voici les villes organisatrices à proximité de vos "running spots" favoris.</h6>
+        <br/>
+        <div id="mapid"></div>
+        <script>
+          var mymap = L.map('mapid').setView([50.616437,5.598439], 13);
+          L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+              attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+              maxZoom: 18,
+              id: 'mapbox/streets-v11',
+              tileSize: 512,
+              zoomOffset: -1,
+              accessToken: 'pk.eyJ1IjoiYmVhdWxlIiwiYSI6ImNrZmh2M3cyNjBwMWEycm52eWdpcXBsaDAifQ._dn2fIFXkeGWb6YjjtNH8w'
+          }).addTo(mymap);
+
+          var marker = L.marker([50.585629, 5.645125]).addTo(mymap);
+          marker.bindPopup("<b>Chaudfontaine</b><br>Contact: Jérôme Rompen 04 361 56 23.").openPopup();
+          
+          </script>
+      </div>
+      {{else}}
+      <div class="col-md-4">
+        <div class="gallery">
+          <a target="_blank" href="img_5terre.jpg">
+            <img src="https://www.mc.be/media/media/jcpmf-vert_tcm49-31425.jpg" alt="Cinque Terre" width="600" height="400">
+          </a>
+          <div class="desc"><b>Je cours pour ma forme</b><br/>Vous êtes peu ou non sportifs et vous souhaitez améliorer votre forme grâce à la course à pied ? Le programme « Je cours pour ma forme » va vous aider à y arriver !</div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4 mb-5">
-        <div class="portfolio-item mx-auto" data-toggle="modal" data-target="#portfolioModal3">
-          <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-            <div class="portfolio-item-caption-content text-center text-white"><i class="fas fa-code fa-3x"></i>
-            </div>
-          </div>
-          <img class="img-fluid" src="https://www.mc.be/media//media/delhalle_logo_tcm49-31436.png" alt="" />
+      <div class="col-md-4">
+        <div class="gallery">
+          <a target="_blank" href="img_5terre.jpg">
+            <img src="https://www.eneosport.be/images/eneosport_278px.png" alt="Cinque Terre" width="600" height="400">
+          </a>
+          <div class="desc"><b>Enéo</b>Énéo (anciennement UCP), mouvement social des aînés, est une organisation de groupements locaux de rencontre qui brisent l'isolement des aînés.</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="gallery">
+          <a target="_blank" href="img_5terre.jpg">
+            <img src="https://www.mc.be/media//media/delhalle_logo_tcm49-31436.png" alt="Cinque Terre" width="600" height="400">
+          </a>
+          <div class="desc"><b>Le Challenge Delhalle</b>Le Challenge Delhalle est organisé par et pour des coureurs. Chaque année, il réunit environ 8 000 participants.</div>
         </div>
       </div>
       {{/if}}

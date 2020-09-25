@@ -11,6 +11,29 @@
   width: 100vw;
 }
 
+div.gallery {
+  margin: 5px;
+  border: 1px solid #317433;
+  float: left;
+  width: 300px;
+  height: 350px;
+  background-color:#efede3;
+}
+
+div.gallery:hover {
+  border: 1px solid #777;
+}
+
+div.gallery img {
+  width: 100%;
+  height: auto;
+}
+
+div.desc {
+  padding: 15px;
+  text-align: center;
+}
+
 #chartdiv {
   width: 100%;
   height: 500px;
@@ -25,3 +48,5 @@
   width: 100%;
   height: 200px;
 }
+
+#mapid { height: 380px; }
