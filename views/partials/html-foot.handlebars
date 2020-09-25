@@ -215,10 +215,10 @@ var chart3 = am4core.create("chartdivweek", am4charts.XYChart);
 
 chart3.data = [{
         "intensitity": "Elevé",
-        "duration": {{weeklyResults.32.physicalActivity.0.intensity.0.duration}},
+        "duration": {{weeklyResults.32.physicalActivity.0.intensity.0.duration}}/60,
     }, {
         "intensitity": "Modéré",
-        "duration": {{weeklyResults.32.physicalActivity.0.intensity.1.duration}},
+        "duration": {{weeklyResults.32.physicalActivity.0.intensity.1.duration}}/60,
     }, {
         "intensitity": "Faible",
         "duration": 0,

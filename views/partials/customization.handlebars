@@ -100,19 +100,15 @@
               <div id="chartdivweekly"></div>
             <br/><br/>
             <hr/>
-            <div class="form-group">
-            <select class="form-control" id="exampleFormControlSelect1">
-                  <option>Semaine 34</option>
-                  <option>Semaine 30</option>
-                  <option>Semaine 30</option>
-                  <option>Semaine 30</option>
-                  <option>Semaine 30</option>
-                </select>
-                <h3>Distance: {{weeklyResults.32.physicalActivity.0.amount.0.byDistance}} mètres</h3>
-                <h3>Durée: {{weeklyResults.32.physicalActivity.0.amount.0.byHour}} heures</h3>
-                <h3>Sorties: {{weeklyResults.32.physicalActivity.0.amount.0.byRepetition}}</h3>
+            <div class="text-left">
+            <h3>Semaine 34:</h3>
+              <br/><br/>
+
+                <h6>Distance: {{weeklyResults.32.physicalActivity.0.amount.0.byDistance}} mètres</h6>
+                <h6>Durée: {{weeklyResults.32.physicalActivity.0.amount.0.byHour}} heures</h6>
+                <h6>Nombre de sorties: {{weeklyResults.32.physicalActivity.0.amount.0.byRepetition}}</h6>
+                <h6>Intensités:</h6>
                 <div id="chartdivweek"></div>
-              </div>
             </div>
           </div>
         </div>
